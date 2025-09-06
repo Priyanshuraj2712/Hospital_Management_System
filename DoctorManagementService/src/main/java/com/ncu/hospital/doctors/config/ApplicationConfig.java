@@ -1,0 +1,13 @@
+package com.ncu.hospital.doctors.config;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Bean;
+import org.modelmapper.ModelMapper;
+
+@Configuration
+public class ApplicationConfig {
+    @Bean
+    public ModelMapper modelMapper() {
+        ModelMapper modelMapper = new ModelMapper();
+        return modelMapper;
+    }
+}
