@@ -7,7 +7,7 @@ import com.ncu.hospital.billings.irepository.IBillingRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestClient;
-import com.ncu.hospital.appointments.dto.PatientDto;
+import com.ncu.hospital.billings.dto.PatientDto;
 import java.util.ArrayList;
 import java.util.List;
 
