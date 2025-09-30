@@ -1,4 +1,4 @@
-package com.ncu.hospital.appointments.dto;
+package com.ncu.hospital.billings.dto;
 
 public class PatientDto {
     private int id;

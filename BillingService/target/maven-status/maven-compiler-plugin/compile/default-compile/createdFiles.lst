@@ -1,10 +1,7 @@
 com/ncu/hospital/billings/repository/BillingRepository.class
-com/ncu/hospital/appointments/dto/PatientDto.class
 com/ncu/hospital/billings/irepository/IBillingRepository.class
-com/ncu/hospital/billings/service/BillingService.class
 com/ncu/hospital/billings/billingserviceapplication.class
 com/ncu/hospital/billings/config/ApplicationConfig.class
 com/ncu/hospital/billings/dto/BillingDto.class
-com/ncu/hospital/billings/controller/BillingServiceController.class
 com/ncu/hospital/billings/repository/BillingRowMapper.class
 com/ncu/hospital/billings/model/Billing.class
