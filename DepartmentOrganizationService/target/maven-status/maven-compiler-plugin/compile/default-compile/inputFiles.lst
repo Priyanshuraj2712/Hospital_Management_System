@@ -1,4 +1,5 @@
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/DepartmentOrganizationService/src/main/java/com/ncu/hospital/departments/config/ApplicationConfig.java
+/Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/DepartmentOrganizationService/src/main/java/com/ncu/hospital/departments/config/DepartmentOrganizationServiceFilter.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/DepartmentOrganizationService/src/main/java/com/ncu/hospital/departments/controller/departmentorganizationcontroller.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/DepartmentOrganizationService/src/main/java/com/ncu/hospital/departments/departmentorganizationserviceapplication.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/DepartmentOrganizationService/src/main/java/com/ncu/hospital/departments/dto/DepartmentDto.java

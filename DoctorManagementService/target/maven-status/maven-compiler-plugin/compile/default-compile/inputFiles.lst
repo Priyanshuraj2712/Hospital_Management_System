@@ -1,4 +1,5 @@
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/DoctorManagementService/src/main/java/com/ncu/hospital/doctors/config/ApplicationConfig.java
+/Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/DoctorManagementService/src/main/java/com/ncu/hospital/doctors/config/DoctorManagementServiceFilter.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/DoctorManagementService/src/main/java/com/ncu/hospital/doctors/controller/doctormanagementcontroller.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/DoctorManagementService/src/main/java/com/ncu/hospital/doctors/doctormanagementserviceapplication.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/DoctorManagementService/src/main/java/com/ncu/hospital/doctors/dto/DoctorDto.java
