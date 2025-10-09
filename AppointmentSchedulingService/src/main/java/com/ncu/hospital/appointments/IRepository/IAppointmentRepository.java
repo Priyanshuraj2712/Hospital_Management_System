@@ -12,4 +12,8 @@ public interface IAppointmentRepository {
     void rescheduleAppointment(Appointment appointment);
     void cancelAppointment(int appointmentId);
 
+    // Pagination methods
+    List<Appointment> getAppointmentsByPage(int page, int size);
+    List<Appointment> getAppointmentsByRange(int start, int end);
+    int getTotalAppointmentsCount();
 }

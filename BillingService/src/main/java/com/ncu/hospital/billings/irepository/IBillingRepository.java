@@ -10,4 +10,9 @@ public interface IBillingRepository {
     List<Billing> getBillsByPatientId(int patientId);
     void updateBill(Billing billing);
     void deleteBill(int id);
+    
+    // Pagination methods
+    List<Billing> getBillingsByPage(int page, int size);
+    List<Billing> getBillingsByRange(int start, int end);
+    int getTotalBillingsCount();
 }

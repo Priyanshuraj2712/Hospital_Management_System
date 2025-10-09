@@ -3,6 +3,7 @@ package com.ncu.hospital.receptions.controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.ncu.hospital.receptions.dto.ReceptionDto;
+import com.ncu.hospital.receptions.dto.PaginatedReceptionsDto;
 import com.ncu.hospital.receptions.service.ReceptionService;
 import java.util.List;
 import java.util.Map;
@@ -57,5 +58,21 @@ public class ReceptionHandlingController {
         } catch (Exception e) {
             return "Error deleting record: " + e.getMessage();
         }
+    }
+
+    @GetMapping("/nextpage")
+    public PaginatedReceptionsDto getPaginatedReceptions(
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size,
+            @RequestParam(value = "start", required = false) Integer start,
+            @RequestParam(value = "end", required = false) Integer end) {
+        // If start and end are provided, use range pagination
+        if (start != null && end != null) {
+            return receptionService.getReceptionsByRange(start, end);
+        }
+        // Otherwise, use page and size (default to 0 and 100 if not provided)
+        int pageNum = (page != null) ? page : 0;
+        int pageSize = (size != null) ? size : 100;
+        return receptionService.getReceptionsByPage(pageNum, pageSize);
     }
 }

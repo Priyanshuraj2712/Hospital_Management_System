@@ -33,6 +33,8 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getPath().toString();
+    
+
         if (path.startsWith("/auth/")) {
             return chain.filter(exchange);
         }
@@ -55,7 +57,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         WebClient client = webClientBUilder.build();
 
         Mono<ResponseEntity<Void>> responseMono = client.post()
-            .uri("lb://authservice/auth/authenticate")
+            .uri("lb://authenticationservice/auth/authenticate")
             .bodyValue(request)
             .retrieve()
             .toBodilessEntity();
@@ -83,6 +85,6 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     }
     @Override
     public int getOrder() {
-        return -1; // Set the order of the filter
+        return -1;
     }
 }

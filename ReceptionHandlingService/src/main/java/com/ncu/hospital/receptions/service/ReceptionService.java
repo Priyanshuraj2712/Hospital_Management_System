@@ -12,6 +12,7 @@ import org.springframework.web.client.RestClient;
 import com.ncu.hospital.receptions.dto.PatientDto;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import com.ncu.hospital.receptions.dto.PaginatedReceptionsDto;
 
 @Service(value = "ReceptionService")
 public class ReceptionService {
@@ -90,5 +91,41 @@ public class ReceptionService {
     public ReceptionDto getReceptionById(int id) {
         Reception reception = receptionRepository.getReceptionById(id);
         return reception != null ? modelMapper.map(reception, ReceptionDto.class) : null;
+    }
+
+    public PaginatedReceptionsDto getReceptionsByPage(int page, int size) {
+        int totalElements = receptionRepository.getTotalReceptionsCount();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<Reception> receptions = receptionRepository.getReceptionsByPage(page, size);
+        List<ReceptionDto> receptionDtos = new ArrayList<>();
+        for (Reception reception : receptions) {
+            receptionDtos.add(modelMapper.map(reception, ReceptionDto.class));
+        }
+        PaginatedReceptionsDto result = new PaginatedReceptionsDto();
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotalPages(totalPages);
+        result.setTotalElements(totalElements);
+        result.setReceptions(receptionDtos);
+        return result;
+    }
+
+    public PaginatedReceptionsDto getReceptionsByRange(int start, int end) {
+        int totalElements = receptionRepository.getTotalReceptionsCount();
+        int size = end - start + 1;
+        int page = start / size;
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<Reception> receptions = receptionRepository.getReceptionsByRange(start, end);
+        List<ReceptionDto> receptionDtos = new ArrayList<>();
+        for (Reception reception : receptions) {
+            receptionDtos.add(modelMapper.map(reception, ReceptionDto.class));
+        }
+        PaginatedReceptionsDto result = new PaginatedReceptionsDto();
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotalPages(totalPages);
+        result.setTotalElements(totalElements);
+        result.setReceptions(receptionDtos);
+        return result;
     }
 }

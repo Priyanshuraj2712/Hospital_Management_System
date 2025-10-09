@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestClient;
 import com.ncu.hospital.billings.dto.PatientDto;
+import com.ncu.hospital.billings.dto.PaginatedBillingsDto;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,5 +78,41 @@ public class BillingService {
 
     public void deleteBill(int id) {
         billingRepository.deleteBill(id);
+    }
+
+    public PaginatedBillingsDto getBillingsByPage(int page, int size) {
+        int totalElements = billingRepository.getTotalBillingsCount();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<Billing> billings = billingRepository.getBillingsByPage(page, size);
+        List<BillingDto> billingDtos = new ArrayList<>();
+        for (Billing billing : billings) {
+            billingDtos.add(modelMapper.map(billing, BillingDto.class));
+        }
+        PaginatedBillingsDto result = new PaginatedBillingsDto();
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotalPages(totalPages);
+        result.setTotalElements(totalElements);
+        result.setBillings(billingDtos);
+        return result;
+    }
+
+    public PaginatedBillingsDto getBillingsByRange(int start, int end) {
+        int totalElements = billingRepository.getTotalBillingsCount();
+        int size = end - start + 1;
+        int page = start / size;
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<Billing> billings = billingRepository.getBillingsByRange(start, end);
+        List<BillingDto> billingDtos = new ArrayList<>();
+        for (Billing billing : billings) {
+            billingDtos.add(modelMapper.map(billing, BillingDto.class));
+        }
+        PaginatedBillingsDto result = new PaginatedBillingsDto();
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotalPages(totalPages);
+        result.setTotalElements(totalElements);
+        result.setBillings(billingDtos);
+        return result;
     }
 }

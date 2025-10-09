@@ -7,6 +7,7 @@
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/AppointmentSchedulingService/src/main/java/com/ncu/hospital/appointments/controller/appointmentschedulingcontroller.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/AppointmentSchedulingService/src/main/java/com/ncu/hospital/appointments/dto/AppointmentDto.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/AppointmentSchedulingService/src/main/java/com/ncu/hospital/appointments/dto/DoctorDto.java
+/Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/AppointmentSchedulingService/src/main/java/com/ncu/hospital/appointments/dto/PaginatedAppointmentsDto.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/AppointmentSchedulingService/src/main/java/com/ncu/hospital/appointments/dto/PatientDto.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/AppointmentSchedulingService/src/main/java/com/ncu/hospital/appointments/model/Appointment.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/AppointmentSchedulingService/src/main/java/com/ncu/hospital/appointments/service/AppointmentService.java

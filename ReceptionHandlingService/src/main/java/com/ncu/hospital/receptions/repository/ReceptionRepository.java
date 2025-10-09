@@ -94,4 +94,39 @@ public class ReceptionRepository implements IReceptionRepository {
             return false;
         }
     }
+
+    // Pagination: fetch by page and size
+    public List<Reception> getReceptionsByPage(int page, int size) {
+        String sql = "SELECT * FROM Reception LIMIT ? OFFSET ?";
+        int offset = page * size;
+        try {
+            return jdbcTemplate.query(sql, new Object[]{size, offset}, new ReceptionRowMapper());
+        } catch (Exception e) {
+            System.out.println("Error fetching paginated receptions: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Pagination: fetch by start and end index (inclusive)
+    public List<Reception> getReceptionsByRange(int start, int end) {
+        String sql = "SELECT * FROM Reception LIMIT ? OFFSET ?";
+        int size = end - start + 1;
+        try {
+            return jdbcTemplate.query(sql, new Object[]{size, start}, new ReceptionRowMapper());
+        } catch (Exception e) {
+            System.out.println("Error fetching receptions by range: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Get total count for pagination
+    public int getTotalReceptionsCount() {
+        String sql = "SELECT COUNT(*) FROM Reception";
+        try {
+            return jdbcTemplate.queryForObject(sql, Integer.class);
+        } catch (Exception e) {
+            System.out.println("Error counting receptions: " + e.getMessage());
+            return 0;
+        }
+    }
 }

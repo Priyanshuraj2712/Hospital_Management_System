@@ -10,4 +10,9 @@ public interface IPatientRepository {
     public void addPatient(Patient patient);
     public void updatePatient(Patient patient);
     public void deletePatient(int id);
+
+    // Pagination methods
+    List<Patient> getPatientsByPage(int page, int size);
+    List<Patient> getPatientsByRange(int start, int end);
+    int getTotalPatientsCount();
 }

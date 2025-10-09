@@ -76,4 +76,39 @@ public class DoctorRepository implements IDoctorRepository {
             return null;
         }
     }
+
+    // Pagination: fetch by page and size
+    public List<Doctor> getDoctorsByPage(int page, int size) {
+        String sql = "SELECT * FROM Doctor LIMIT ? OFFSET ?";
+        int offset = page * size;
+        try {
+            return jdbcTemplate.query(sql, new Object[]{size, offset}, new DoctorRowMapper());
+        } catch (Exception e) {
+            System.out.println("Error fetching paginated doctors: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Pagination: fetch by start and end index (inclusive)
+    public List<Doctor> getDoctorsByRange(int start, int end) {
+        String sql = "SELECT * FROM Doctor LIMIT ? OFFSET ?";
+        int size = end - start + 1;
+        try {
+            return jdbcTemplate.query(sql, new Object[]{size, start}, new DoctorRowMapper());
+        } catch (Exception e) {
+            System.out.println("Error fetching doctors by range: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Get total count for pagination
+    public int getTotalDoctorsCount() {
+        String sql = "SELECT COUNT(*) FROM Doctor";
+        try {
+            return jdbcTemplate.queryForObject(sql, Integer.class);
+        } catch (Exception e) {
+            System.out.println("Error counting doctors: " + e.getMessage());
+            return 0;
+        }
+    }
 }

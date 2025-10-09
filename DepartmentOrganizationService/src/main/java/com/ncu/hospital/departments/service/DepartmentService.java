@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
+import com.ncu.hospital.departments.dto.PaginatedDepartmentsDto;
 
 @Service(value = "DepartmentService")
 public class DepartmentService {
@@ -53,5 +54,40 @@ public class DepartmentService {
             departmentDtos.add(dto);
         }
         return departmentDtos;
+    }
+    public PaginatedDepartmentsDto getDepartmentsByPage(int page, int size) {
+        int totalElements = departmentRepository.getTotalDepartmentsCount();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<Department> departments = departmentRepository.getDepartmentsByPage(page, size);
+        List<DepartmentDto> departmentDtos = new ArrayList<>();
+        for (Department department : departments) {
+            departmentDtos.add(modelMapper.map(department, DepartmentDto.class));
+        }
+        PaginatedDepartmentsDto result = new PaginatedDepartmentsDto();
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotalPages(totalPages);
+        result.setTotalElements(totalElements);
+        result.setDepartments(departmentDtos);
+        return result;
+    }
+
+    public PaginatedDepartmentsDto getDepartmentsByRange(int start, int end) {
+        int totalElements = departmentRepository.getTotalDepartmentsCount();
+        int size = end - start + 1;
+        int page = start / size;
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<Department> departments = departmentRepository.getDepartmentsByRange(start, end);
+        List<DepartmentDto> departmentDtos = new ArrayList<>();
+        for (Department department : departments) {
+            departmentDtos.add(modelMapper.map(department, DepartmentDto.class));
+        }
+        PaginatedDepartmentsDto result = new PaginatedDepartmentsDto();
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotalPages(totalPages);
+        result.setTotalElements(totalElements);
+        result.setDepartments(departmentDtos);
+        return result;
     }
 }

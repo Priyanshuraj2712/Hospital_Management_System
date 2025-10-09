@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.ncu.hospital.appointments.dto.AppointmentDto;
 import com.ncu.hospital.appointments.service.AppointmentService;    
+import com.ncu.hospital.appointments.dto.PaginatedAppointmentsDto;
 
 @RequestMapping("/appointments")
 @RestController
@@ -57,5 +58,21 @@ public class appointmentschedulingcontroller {
     @DeleteMapping(path="/{id}")
     public void cancelAppointment(@PathVariable("id") int id) {
         appointmentService.cancelAppointment(id);
+    }
+
+    @GetMapping(path="/nextpage")
+    public PaginatedAppointmentsDto getPaginatedAppointments(
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size,
+            @RequestParam(value = "start", required = false) Integer start,
+            @RequestParam(value = "end", required = false) Integer end) {
+        // If start and end are provided, use range pagination
+        if (start != null && end != null) {
+            return appointmentService.getAppointmentsByRange(start, end);
+        }
+        // Otherwise, use page and size (default to 0 and 100 if not provided)
+        int pageNum = (page != null) ? page : 0;
+        int pageSize = (size != null) ? size : 100;
+        return appointmentService.getAppointmentsByPage(pageNum, pageSize);
     }
 }

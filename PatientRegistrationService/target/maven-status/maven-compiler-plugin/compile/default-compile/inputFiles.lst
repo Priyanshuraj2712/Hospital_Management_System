@@ -2,6 +2,7 @@
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/PatientRegistrationService/src/main/java/com/ncu/hospital/patients/config/ApplicationConfig.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/PatientRegistrationService/src/main/java/com/ncu/hospital/patients/config/PateintRegistrationServiceFilter.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/PatientRegistrationService/src/main/java/com/ncu/hospital/patients/controller/PatientRegistrationController.java
+/Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/PatientRegistrationService/src/main/java/com/ncu/hospital/patients/dto/PaginatedPatientsDto.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/PatientRegistrationService/src/main/java/com/ncu/hospital/patients/dto/PatientDto.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/PatientRegistrationService/src/main/java/com/ncu/hospital/patients/irepository/IPatientRepository.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/PatientRegistrationService/src/main/java/com/ncu/hospital/patients/model/Patient.java

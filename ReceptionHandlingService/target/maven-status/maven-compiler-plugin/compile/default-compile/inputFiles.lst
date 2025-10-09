@@ -1,6 +1,7 @@
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/ReceptionHandlingService/src/main/java/com/ncu/hospital/receptions/config/ApplicationConfig.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/ReceptionHandlingService/src/main/java/com/ncu/hospital/receptions/config/ReceptionHandlingServiceFilter.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/ReceptionHandlingService/src/main/java/com/ncu/hospital/receptions/controller/ReceptionHandlingController.java
+/Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/ReceptionHandlingService/src/main/java/com/ncu/hospital/receptions/dto/PaginatedReceptionsDto.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/ReceptionHandlingService/src/main/java/com/ncu/hospital/receptions/dto/PatientDto.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/ReceptionHandlingService/src/main/java/com/ncu/hospital/receptions/dto/ReceptionDto.java
 /Users/priyanshu/Desktop/Microservices/Hospital Management System/Hospital_Management_System/ReceptionHandlingService/src/main/java/com/ncu/hospital/receptions/irepository/IReceptionRepository.java

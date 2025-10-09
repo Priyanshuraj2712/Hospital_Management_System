@@ -11,4 +11,8 @@ public interface IReceptionRepository {
     void deleteRecord(int id);
     Reception getReceptionById(int id);
     boolean isPatientCheckedIn(int patientId);
+    // Pagination methods
+    List<Reception> getReceptionsByPage(int page, int size);
+    List<Reception> getReceptionsByRange(int start, int end);
+    int getTotalReceptionsCount();
 }

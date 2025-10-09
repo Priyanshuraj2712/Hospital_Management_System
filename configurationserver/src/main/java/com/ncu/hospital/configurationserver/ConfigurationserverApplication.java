@@ -7,7 +7,6 @@ import org.springframework.cloud.config.server.EnableConfigServer;
 @SpringBootApplication
 @EnableConfigServer
 public class ConfigurationserverApplication {
-
 	public static void main(String[] args) {
 		SpringApplication app=new SpringApplication(ConfigurationserverApplication.class);
 		String mode=System.getenv("config_mode");

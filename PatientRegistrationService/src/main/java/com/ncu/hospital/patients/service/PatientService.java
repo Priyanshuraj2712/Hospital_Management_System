@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.ncu.hospital.patients.irepository.IPatientRepository;
 import com.ncu.hospital.patients.model.Patient;
 import com.ncu.hospital.patients.dto.PatientDto;
+import com.ncu.hospital.patients.dto.PaginatedPatientsDto;
 import org.modelmapper.ModelMapper;
 import java.util.ArrayList;
 
@@ -57,4 +58,39 @@ public class PatientService {
         patientRepository.deletePatient(id);
     }
     
+    public PaginatedPatientsDto getPatientsByPage(int page, int size) {
+        int totalElements = patientRepository.getTotalPatientsCount();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<Patient> patients = patientRepository.getPatientsByPage(page, size);
+        List<PatientDto> patientDtos = new ArrayList<>();
+        for (Patient patient : patients) {
+            patientDtos.add(modelMapper.map(patient, PatientDto.class));
+        }
+        PaginatedPatientsDto result = new PaginatedPatientsDto();
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotalPages(totalPages);
+        result.setTotalElements(totalElements);
+        result.setPatients(patientDtos);
+        return result;
+    }
+
+    public PaginatedPatientsDto getPatientsByRange(int start, int end) {
+        int totalElements = patientRepository.getTotalPatientsCount();
+        int size = end - start + 1;
+        int page = start / size;
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<Patient> patients = patientRepository.getPatientsByRange(start, end);
+        List<PatientDto> patientDtos = new ArrayList<>();
+        for (Patient patient : patients) {
+            patientDtos.add(modelMapper.map(patient, PatientDto.class));
+        }
+        PaginatedPatientsDto result = new PaginatedPatientsDto();
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotalPages(totalPages);
+        result.setTotalElements(totalElements);
+        result.setPatients(patientDtos);
+        return result;
+    }
 }

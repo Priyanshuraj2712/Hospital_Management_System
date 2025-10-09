@@ -9,4 +9,8 @@ public interface IDepartmentRepository {
     public void updateDepartment(Department department);
     public void deleteDepartment(int id); 
     List<Department> getDepartmentsByFloor(int floor);
+    // Pagination methods
+    List<Department> getDepartmentsByPage(int page, int size);
+    List<Department> getDepartmentsByRange(int start, int end);
+    int getTotalDepartmentsCount();
 }

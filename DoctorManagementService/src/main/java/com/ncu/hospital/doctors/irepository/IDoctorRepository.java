@@ -8,4 +8,8 @@ public interface IDoctorRepository {
     public void updateDoctor(Doctor doctor);
     public void deleteDoctor(int id); 
     List<Doctor> getDoctorsBySpecialization(String specialization);
+    // Pagination methods
+    List<Doctor> getDoctorsByPage(int page, int size);
+    List<Doctor> getDoctorsByRange(int start, int end);
+    int getTotalDoctorsCount();
 }

@@ -79,4 +79,39 @@ public class DepartmentRepository implements IDepartmentRepository {
         }
         return departments;
     }
+
+    // Pagination: fetch by page and size
+    public List<Department> getDepartmentsByPage(int page, int size) {
+        String sql = "SELECT * FROM Department LIMIT ? OFFSET ?";
+        int offset = page * size;
+        try {
+            return jdbcTemplate.query(sql, new Object[]{size, offset}, new DepartmentRowMapper());
+        } catch (Exception e) {
+            System.out.println("Error fetching paginated departments: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Pagination: fetch by start and end index (inclusive)
+    public List<Department> getDepartmentsByRange(int start, int end) {
+        String sql = "SELECT * FROM Department LIMIT ? OFFSET ?";
+        int size = end - start + 1;
+        try {
+            return jdbcTemplate.query(sql, new Object[]{size, start}, new DepartmentRowMapper());
+        } catch (Exception e) {
+            System.out.println("Error fetching departments by range: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Get total count for pagination
+    public int getTotalDepartmentsCount() {
+        String sql = "SELECT COUNT(*) FROM Department";
+        try {
+            return jdbcTemplate.queryForObject(sql, Integer.class);
+        } catch (Exception e) {
+            System.out.println("Error counting departments: " + e.getMessage());
+            return 0;
+        }
+    }
 }

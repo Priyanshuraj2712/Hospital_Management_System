@@ -53,4 +53,20 @@ public class PatientRegistrationController {
     public void deletePatient(@PathVariable("id") int id) {
         patientService.deletePatient(id);
     }
+
+    @GetMapping(path="/nextpage")
+    public Object getPaginatedPatients(
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size,
+            @RequestParam(value = "start", required = false) Integer start,
+            @RequestParam(value = "end", required = false) Integer end) {
+        // If start and end are provided, use range pagination
+        if (start != null && end != null) {
+            return patientService.getPatientsByRange(start, end);
+        }
+        // Otherwise, use page and size (default to 0 and 100 if not provided)
+        int pageNum = (page != null) ? page : 0;
+        int pageSize = (size != null) ? size : 100;
+        return patientService.getPatientsByPage(pageNum, pageSize);
+    }
 }

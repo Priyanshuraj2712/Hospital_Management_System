@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.ncu.hospital.doctors.service.DoctorService;
 import com.ncu.hospital.doctors.dto.DoctorDto;
+import com.ncu.hospital.doctors.dto.PaginatedDoctorsDto;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -53,5 +54,21 @@ public class doctormanagementcontroller {
     @GetMapping(path="/specialization/{name}")
     public List<DoctorDto> getDoctorsBySpecialization(@PathVariable("name") String specialization) {
         return doctorService.getDoctorsBySpecialization(specialization);
+    }
+
+    @GetMapping(path="/nextpage")
+    public PaginatedDoctorsDto getPaginatedDoctors(
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size,
+            @RequestParam(value = "start", required = false) Integer start,
+            @RequestParam(value = "end", required = false) Integer end) {
+        // If start and end are provided, use range pagination
+        if (start != null && end != null) {
+            return doctorService.getDoctorsByRange(start, end);
+        }
+        // Otherwise, use page and size (default to 0 and 100 if not provided)
+        int pageNum = (page != null) ? page : 0;
+        int pageSize = (size != null) ? size : 100;
+        return doctorService.getDoctorsByPage(pageNum, pageSize);
     }
 }

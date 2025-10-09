@@ -76,4 +76,39 @@ public class PatientRepository implements IPatientRepository {
             System.out.println("Error deleting patient: " + e.getMessage());
         }
     }
+
+    // Pagination: fetch by page and size
+    public List<Patient> getPatientsByPage(int page, int size) {
+        String sql = "SELECT * FROM Patient LIMIT ? OFFSET ?";
+        int offset = page * size;
+        try {
+            return jdbcTemplate.query(sql, new Object[]{size, offset}, new PatientRowMapper());
+        } catch (Exception e) {
+            System.out.println("Error fetching paginated patients: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Pagination: fetch by start and end index (inclusive)
+    public List<Patient> getPatientsByRange(int start, int end) {
+        String sql = "SELECT * FROM Patient LIMIT ? OFFSET ?";
+        int size = end - start + 1;
+        try {
+            return jdbcTemplate.query(sql, new Object[]{size, start}, new PatientRowMapper());
+        } catch (Exception e) {
+            System.out.println("Error fetching patients by range: " + e.getMessage());
+            return null;
+        }
+    }
+
+    // Get total count for pagination
+    public int getTotalPatientsCount() {
+        String sql = "SELECT COUNT(*) FROM Patient";
+        try {
+            return jdbcTemplate.queryForObject(sql, Integer.class);
+        } catch (Exception e) {
+            System.out.println("Error counting patients: " + e.getMessage());
+            return 0;
+        }
+    }
 }

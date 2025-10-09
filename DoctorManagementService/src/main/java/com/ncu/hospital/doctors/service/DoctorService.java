@@ -7,6 +7,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
+import com.ncu.hospital.doctors.dto.PaginatedDoctorsDto;
 
 @Service(value = "DoctorService")
 public class DoctorService {
@@ -58,5 +59,41 @@ public class DoctorService {
             doctorDtos.add(dto);
         }
         return doctorDtos;
+    }
+
+    public PaginatedDoctorsDto getDoctorsByPage(int page, int size) {
+        int totalElements = doctorRepository.getTotalDoctorsCount();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<Doctor> doctors = doctorRepository.getDoctorsByPage(page, size);
+        List<DoctorDto> doctorDtos = new ArrayList<>();
+        for (Doctor doctor : doctors) {
+            doctorDtos.add(modelMapper.map(doctor, DoctorDto.class));
+        }
+        PaginatedDoctorsDto result = new PaginatedDoctorsDto();
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotalPages(totalPages);
+        result.setTotalElements(totalElements);
+        result.setDoctors(doctorDtos);
+        return result;
+    }
+
+    public PaginatedDoctorsDto getDoctorsByRange(int start, int end) {
+        int totalElements = doctorRepository.getTotalDoctorsCount();
+        int size = end - start + 1;
+        int page = start / size;
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<Doctor> doctors = doctorRepository.getDoctorsByRange(start, end);
+        List<DoctorDto> doctorDtos = new ArrayList<>();
+        for (Doctor doctor : doctors) {
+            doctorDtos.add(modelMapper.map(doctor, DoctorDto.class));
+        }
+        PaginatedDoctorsDto result = new PaginatedDoctorsDto();
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotalPages(totalPages);
+        result.setTotalElements(totalElements);
+        result.setDoctors(doctorDtos);
+        return result;
     }
 }

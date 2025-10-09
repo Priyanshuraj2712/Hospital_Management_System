@@ -11,6 +11,7 @@ import java.util.List;
 import org.springframework.web.client.RestClient;
 import com.ncu.hospital.appointments.dto.PatientDto;
 import com.ncu.hospital.appointments.dto.DoctorDto;
+import com.ncu.hospital.appointments.dto.PaginatedAppointmentsDto;
 
 
 @Service(value = "appointmentService")
@@ -90,5 +91,41 @@ public class AppointmentService {
     }
     public void cancelAppointment(int appointmentId) {
         appointmentRepository.cancelAppointment(appointmentId);
+    }
+
+    public PaginatedAppointmentsDto getAppointmentsByPage(int page, int size) {
+        int totalElements = appointmentRepository.getTotalAppointmentsCount();
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<Appointment> appointments = appointmentRepository.getAppointmentsByPage(page, size);
+        List<AppointmentDto> appointmentDtos = new ArrayList<>();
+        for (Appointment appointment : appointments) {
+            appointmentDtos.add(modelMapper.map(appointment, AppointmentDto.class));
+        }
+        PaginatedAppointmentsDto result = new PaginatedAppointmentsDto();
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotalPages(totalPages);
+        result.setTotalElements(totalElements);
+        result.setAppointments(appointmentDtos);
+        return result;
+    }
+
+    public PaginatedAppointmentsDto getAppointmentsByRange(int start, int end) {
+        int totalElements = appointmentRepository.getTotalAppointmentsCount();
+        int size = end - start + 1;
+        int page = start / size;
+        int totalPages = (int) Math.ceil((double) totalElements / size);
+        List<Appointment> appointments = appointmentRepository.getAppointmentsByRange(start, end);
+        List<AppointmentDto> appointmentDtos = new ArrayList<>();
+        for (Appointment appointment : appointments) {
+            appointmentDtos.add(modelMapper.map(appointment, AppointmentDto.class));
+        }
+        PaginatedAppointmentsDto result = new PaginatedAppointmentsDto();
+        result.setPage(page);
+        result.setSize(size);
+        result.setTotalPages(totalPages);
+        result.setTotalElements(totalElements);
+        result.setAppointments(appointmentDtos);
+        return result;
     }
 }

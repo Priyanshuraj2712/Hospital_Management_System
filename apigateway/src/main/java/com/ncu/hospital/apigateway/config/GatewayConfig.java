@@ -44,8 +44,8 @@ public class GatewayConfig {
                         .uri("lb://billingservice"))
                 .route("receptionhandlingservice", r->r.path("/reception/**")
                         .uri("lb://receptionhandlingservice"))
-                .route("authservice", r->r.path("/auth/**")
-                        .uri("lb://authservice"))
+                .route("authenticationservice", r->r.path("/auth/**")
+                        .uri("lb://authenticationservice"))
                 .build();
         }
 
