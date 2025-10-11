@@ -1,9 +1,14 @@
 package com.ncu.hospital.patients.config;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.reactive.function.client.WebClient;
+
 @Configuration
 public class ApplicationConfig implements WebMvcConfigurer{
     @Bean
@@ -11,6 +16,17 @@ public class ApplicationConfig implements WebMvcConfigurer{
         ModelMapper modelMapper = new ModelMapper();
         return modelMapper;
     }
+    
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(csrf -> csrf.disable())
+            .httpBasic(httpBasic -> httpBasic.disable())
+            .formLogin(formLogin -> formLogin.disable())
+            .authorizeHttpRequests(authz -> authz.anyRequest().permitAll());
+        return http.build();
+    }
+
     @Override
     public void addCorsMappings(CorsRegistry registry) 
     {
@@ -20,4 +36,10 @@ public class ApplicationConfig implements WebMvcConfigurer{
         .allowedHeaders("*")
         .allowCredentials(true);
     }
+
+    @Bean
+      @LoadBalanced
+        public WebClient.Builder webClientBUilder() {
+          return WebClient.builder();
+        }
 }

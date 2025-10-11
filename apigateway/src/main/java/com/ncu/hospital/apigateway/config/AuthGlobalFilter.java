@@ -67,9 +67,18 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
                 Route route = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_ROUTE_ATTR);
                 String routeId = (route != null) ? route.getId() : "default";
 
+                String basicAuthHeader = AuthFactory.BuildAuthHeader(routeId);
+                String base64_Credentials = basicAuthHeader.substring("Basic ".length()).trim();
+                byte[] decodedBytes = Base64.getDecoder().decode(base64_Credentials);
+                String decoded_String = new String(decodedBytes, StandardCharsets.UTF_8);
+                String[] _parts = decoded_String.split(":", 2);
+                String serviceUsername = _parts[0];
+                String servicePassword = _parts.length > 1 ? _parts[1] : "";
                 ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
                     .header(HttpHeaders.AUTHORIZATION, AuthFactory.BuildAuthHeader(routeId))
                     .header("X-API-GATEWAY-SECRET", AuthFactory.getSharedSecret())
+                    .header("X-USERNAME", serviceUsername)
+                    .header("X-PASSWORD", servicePassword)
                     .build();
                 return chain.filter(exchange.mutate().request(mutatedRequest).build());
                 
