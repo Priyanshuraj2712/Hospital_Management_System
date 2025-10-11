@@ -1,0 +1,14 @@
+{
+  "body": {
+    "content": "",
+    "file": false,
+    "fileSize": false
+  },
+  "headers": {
+    "content-type": "application/json",
+    "authorization": "Basic Z3JvdXBAZ21haWwuY29tOmdyb3Vw"
+  },
+  "method": "GET",
+  "title": "New HTTP Request",
+  "url": "http://localhost:9000/billings/"
+}
