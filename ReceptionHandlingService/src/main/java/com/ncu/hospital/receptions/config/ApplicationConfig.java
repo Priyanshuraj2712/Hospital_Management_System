@@ -21,6 +21,10 @@ public class ApplicationConfig implements WebMvcConfigurer {
         return RestClient.builder().build();
     }
     @Bean
+    public org.springframework.web.client.RestTemplate restTemplate() {
+        return new org.springframework.web.client.RestTemplate();
+    }
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())

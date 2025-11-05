@@ -8,8 +8,16 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.ArrayList;
-import org.springframework.web.client.RestClient;
 import com.ncu.hospital.receptions.dto.PatientDto;
+import org.springframework.web.client.HttpClientErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+// using fully-qualified RestTemplate type for injection
+import com.ncu.hospital.receptions.exceptions.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import com.ncu.hospital.receptions.dto.PaginatedReceptionsDto;
@@ -18,38 +26,55 @@ import com.ncu.hospital.receptions.dto.PaginatedReceptionsDto;
 public class ReceptionService {
     private final IReceptionRepository receptionRepository;
     private final ModelMapper modelMapper;
-    private final RestClient restClient;
+    private final org.springframework.web.client.RestTemplate restTemplate;
+    private final Logger logger = LoggerFactory.getLogger(ReceptionService.class);
     private final String PATIENT_SERVICE_URL = "http://localhost:9001/patients/";
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Autowired
-    public ReceptionService(IReceptionRepository receptionRepository, ModelMapper modelMapper, RestClient restClient) {
+    public ReceptionService(IReceptionRepository receptionRepository, ModelMapper modelMapper, org.springframework.web.client.RestTemplate restTemplate) {
         this.receptionRepository = receptionRepository;
         this.modelMapper = modelMapper;
-        this.restClient = RestClient.builder().build();
+        this.restTemplate = restTemplate;
     }
 
-    public void checkInPatient(ReceptionDto receptionDto) {
+    public void checkInPatient(ReceptionDto receptionDto, String authHeader) {
         try {
-            PatientDto patient = restClient.get()
-                .uri(PATIENT_SERVICE_URL + receptionDto.getPatientId())
-                .retrieve()
-                .body(PatientDto.class);
+            HttpHeaders headers = new HttpHeaders();
+            addAuthHeaders(headers, authHeader);
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+            ResponseEntity<PatientDto> resp = this.restTemplate.exchange(
+                    PATIENT_SERVICE_URL + receptionDto.getPatientId(),
+                    HttpMethod.GET,
+                    entity,
+                    PatientDto.class
+            );
 
-            if (patient == null) {
-                throw new RuntimeException("Patient not found in Patient Service");
+            if (resp.getBody() == null) {
+                throw new ResourceNotFoundException("Patient not found in Patient Service");
             }
 
             if (receptionRepository.isPatientCheckedIn(receptionDto.getPatientId())) {
-                throw new RuntimeException("Patient is already checked in");
+                throw new BadRequestException("Patient is already checked in");
             }
 
             Reception reception = modelMapper.map(receptionDto, Reception.class);
             reception.setCheckInTime(LocalDateTime.now().format(formatter));
             reception.setStatus("CHECKED_IN");
             receptionRepository.checkInPatient(reception);
+        } catch (HttpClientErrorException e) {
+            logger.error("Downstream call failed: status={} body={}", e.getStatusCode(), e.getResponseBodyAsString());
+            if (e.getStatusCode() == org.springframework.http.HttpStatus.UNAUTHORIZED) {
+                throw new UnauthorizedException("Unauthorized when calling patient service: " + e.getMessage());
+            } else if (e.getStatusCode() == org.springframework.http.HttpStatus.NOT_FOUND) {
+                throw new ResourceNotFoundException("Patient not found in Patient Service");
+            } else {
+                throw new ReceptionException("Error during check-in: " + e.getMessage(), e);
+            }
+        } catch (ResourceNotFoundException | BadRequestException | UnauthorizedException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Error during check-in: " + e.getMessage());
+            throw new ReceptionException("Error during check-in: " + e.getMessage(), e);
         }
     }
 
@@ -57,7 +82,34 @@ public class ReceptionService {
         if (receptionRepository.isPatientCheckedIn(patientId)) {
             receptionRepository.checkOutPatient(patientId);
         } else {
-            throw new RuntimeException("Patient is not checked in");
+            throw new BadRequestException("Patient is not checked in");
+        }
+    }
+
+    /**
+     * Add authentication headers to downstream calls.
+     * If the incoming Authorization is Basic, decode it and also add X-USERNAME / X-PASSWORD
+     * so services that rely on those headers (filters) will receive credentials.
+     */
+    private void addAuthHeaders(HttpHeaders headers, String authHeader) {
+        if (authHeader == null || authHeader.isEmpty()) return;
+        headers.set("Authorization", authHeader);
+        try {
+            if (authHeader.startsWith("Basic ")) {
+                String b64 = authHeader.substring(6);
+                byte[] decoded = java.util.Base64.getDecoder().decode(b64);
+                String creds = new String(decoded, java.nio.charset.StandardCharsets.UTF_8);
+                int idx = creds.indexOf(':');
+                if (idx > 0) {
+                    String user = creds.substring(0, idx);
+                    String pass = creds.substring(idx + 1);
+                    headers.set("X-USERNAME", user);
+                    headers.set("X-PASSWORD", pass);
+                    logger.debug("Added X-USERNAME/X-PASSWORD to downstream headers for user={}", user);
+                }
+            }
+        } catch (IllegalArgumentException e) {
+            logger.warn("Failed to decode Basic auth header: {}", e.getMessage());
         }
     }
 

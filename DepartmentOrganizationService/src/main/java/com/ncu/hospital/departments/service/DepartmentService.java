@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 import com.ncu.hospital.departments.dto.PaginatedDepartmentsDto;
+import com.ncu.hospital.departments.exceptions.BadRequestException;
+import com.ncu.hospital.departments.exceptions.ResourceNotFoundException;
 
 @Service(value = "DepartmentService")
 public class DepartmentService {
@@ -29,22 +31,46 @@ public class DepartmentService {
     }
     public DepartmentDto getDepartmentById(int id) {
         Department department = departmentRepository.getDepartmentById(id);
-        if (department != null) {
-            return modelMapper.map(department, DepartmentDto.class);
+        if (department == null) {
+            throw new ResourceNotFoundException("Department not found with id: " + id);
         }
-        return null;
+        return modelMapper.map(department, DepartmentDto.class);
     }
+
     public void addDepartment(DepartmentDto departmentDto) {
+        validateDepartmentDto(departmentDto);
         Department department = modelMapper.map(departmentDto, Department.class);
         departmentRepository.addDepartment(department);
     }
+
     public void updateDepartment(int id, DepartmentDto departmentDto) {
+        validateDepartmentDto(departmentDto);
+        // Check if department exists
+        getDepartmentById(id); // This will throw ResourceNotFoundException if not found
         Department department = modelMapper.map(departmentDto, Department.class);
         department.setId(id);
         departmentRepository.updateDepartment(department);
     }
+
     public void deleteDepartment(int id) {
+        // Check if department exists before deleting
+        getDepartmentById(id); // This will throw ResourceNotFoundException if not found
         departmentRepository.deleteDepartment(id);
+    }
+
+    private void validateDepartmentDto(DepartmentDto departmentDto) {
+        if (departmentDto == null) {
+            throw new BadRequestException("Department data cannot be null");
+        }
+        if (departmentDto.getName() == null || departmentDto.getName().trim().isEmpty()) {
+            throw new BadRequestException("Department name is required");
+        }
+        if (departmentDto.getFloor() < 0) {
+            throw new BadRequestException("Invalid floor number");
+        }
+        if (departmentDto.getDescription() == null || departmentDto.getDescription().trim().isEmpty()) {
+            throw new BadRequestException("Department description is required");
+        }
     }
     public List<DepartmentDto> getDepartmentsByFloor(int floor) {
         List<Department> departments = departmentRepository.getDepartmentsByFloor(floor);

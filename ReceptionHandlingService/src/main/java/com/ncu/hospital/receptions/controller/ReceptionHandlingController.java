@@ -7,6 +7,9 @@ import com.ncu.hospital.receptions.dto.PaginatedReceptionsDto;
 import com.ncu.hospital.receptions.service.ReceptionService;
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.ResponseEntity;
+import com.ncu.hospital.receptions.dto.ApiResponse;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @RequestMapping("/reception")
 @RestController
@@ -20,44 +23,35 @@ public class ReceptionHandlingController {
     }
 
     @PostMapping("/checkin")
-    public String checkInPatient(@RequestBody ReceptionDto receptionDto) {
-        try {
-            receptionService.checkInPatient(receptionDto);
-            return "Patient checked in successfully";
-        } catch (Exception e) {
-            return "Error checking in patient: " + e.getMessage();
-        }
+    public ResponseEntity<ApiResponse<Void>> checkInPatient(@RequestBody ReceptionDto receptionDto,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        receptionService.checkInPatient(receptionDto, authHeader);
+        return ApiResponse.ok(null, "Patient checked in successfully");
     }
 
     @PostMapping("/checkout")
-    public String checkOutPatient(@RequestBody Map<String, Integer> request) {
-        try {
-            int patientId = request.get("patientId");
-            receptionService.checkOutPatient(patientId);
-            return "Patient checked out successfully";
-        } catch (Exception e) {
-            return "Error checking out patient: " + e.getMessage();
-        }
+    public ResponseEntity<ApiResponse<Void>> checkOutPatient(@RequestBody Map<String, Integer> request) {
+        int patientId = request.get("patientId");
+        receptionService.checkOutPatient(patientId);
+        return ApiResponse.ok(null, "Patient checked out successfully");
     }
 
     @GetMapping("/current")
-    public List<ReceptionDto> getCurrentPatients() {
-        return receptionService.getCurrentPatients();
+    public ResponseEntity<ApiResponse<List<ReceptionDto>>> getCurrentPatients() {
+        List<ReceptionDto> dtos = receptionService.getCurrentPatients();
+        return ApiResponse.ok(dtos, "Current patients retrieved successfully");
     }
 
     @GetMapping("/history")
-    public List<ReceptionDto> getVisitHistory() {
-        return receptionService.getVisitHistory();
+    public ResponseEntity<ApiResponse<List<ReceptionDto>>> getVisitHistory() {
+        List<ReceptionDto> dtos = receptionService.getVisitHistory();
+        return ApiResponse.ok(dtos, "Visit history retrieved successfully");
     }
 
     @DeleteMapping("/{id}")
-    public String deleteRecord(@PathVariable("id") int id) {
-        try {
-            receptionService.deleteRecord(id);
-            return "Record deleted successfully";
-        } catch (Exception e) {
-            return "Error deleting record: " + e.getMessage();
-        }
+    public ResponseEntity<ApiResponse<Void>> deleteRecord(@PathVariable("id") int id) {
+        receptionService.deleteRecord(id);
+        return ApiResponse.ok(null, "Record deleted successfully");
     }
 
     @GetMapping("/nextpage")

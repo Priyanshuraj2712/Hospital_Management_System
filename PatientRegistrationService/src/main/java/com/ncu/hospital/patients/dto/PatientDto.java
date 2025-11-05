@@ -5,7 +5,7 @@ public class PatientDto {
     private String name;
     private int age;
     private String address;
-    private String phoneNumber; 
+    private String phoneNumber;
 
     public PatientDto() {}
 

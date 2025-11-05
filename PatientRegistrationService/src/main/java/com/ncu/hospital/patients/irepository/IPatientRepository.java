@@ -7,8 +7,8 @@ public interface IPatientRepository {
     public List<Patient> getAllPatients();
     public Patient getPatientById(int id);
     public Patient getPatientByName(String name);
-    public void addPatient(Patient patient);
-    public void updatePatient(Patient patient);
+    public Patient addPatient(Patient patient);
+    public Patient updatePatient(Patient patient);
     public void deletePatient(int id);
 
     // Pagination methods

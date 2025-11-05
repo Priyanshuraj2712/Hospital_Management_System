@@ -15,6 +15,8 @@ import com.ncu.hospital.doctors.dto.DoctorDto;
 import com.ncu.hospital.doctors.dto.PaginatedDoctorsDto;
 import java.util.List;
 import java.util.ArrayList;
+import org.springframework.http.ResponseEntity;
+import com.ncu.hospital.doctors.dto.ApiResponse;
 
 @RequestMapping("/doctors")
 @RestController
@@ -27,48 +29,57 @@ public class doctormanagementcontroller {
     }
 
     @GetMapping(path="/")
-    public List<DoctorDto> getAllDoctors() {
-        return doctorService.getAllDoctors();
+    public ResponseEntity<ApiResponse<List<DoctorDto>>> getAllDoctors() {
+        List<DoctorDto> doctors = doctorService.getAllDoctors();
+        return ApiResponse.ok(doctors, "Doctors retrieved successfully");
     }
 
     @GetMapping(path="/{id}")
-    public DoctorDto getDoctorById(@PathVariable("id") int id) {
-        return doctorService.getDoctorById(id);
+    public ResponseEntity<ApiResponse<DoctorDto>> getDoctorById(@PathVariable("id") int id) {
+        DoctorDto doctor = doctorService.getDoctorById(id);
+        return ApiResponse.ok(doctor, "Doctor retrieved successfully");
     }
 
     @PostMapping(path="/")
-    public void addDoctor(@RequestBody DoctorDto doctorDto) {
+    public ResponseEntity<ApiResponse<DoctorDto>> addDoctor(@RequestBody DoctorDto doctorDto) {
         doctorService.addDoctor(doctorDto);
+        return ApiResponse.ok(doctorDto, "Doctor added successfully");
     }
 
     @PutMapping(path="/{id}")
-    public void updateDoctor(@PathVariable("id") int id, @RequestBody DoctorDto doctorDto) {
+    public ResponseEntity<ApiResponse<DoctorDto>> updateDoctor(@PathVariable("id") int id, @RequestBody DoctorDto doctorDto) {
         doctorService.updateDoctor(id, doctorDto);
+        return ApiResponse.ok(doctorDto, "Doctor updated successfully");
     }
 
     @DeleteMapping(path="/{id}")
-    public void deleteDoctor(@PathVariable("id") int id) {
+    public ResponseEntity<ApiResponse<Void>> deleteDoctor(@PathVariable("id") int id) {
         doctorService.deleteDoctor(id);
+        return ApiResponse.ok(null, "Doctor deleted successfully");
     }
 
     @GetMapping(path="/specialization/{name}")
-    public List<DoctorDto> getDoctorsBySpecialization(@PathVariable("name") String specialization) {
-        return doctorService.getDoctorsBySpecialization(specialization);
+    public ResponseEntity<ApiResponse<List<DoctorDto>>> getDoctorsBySpecialization(@PathVariable("name") String specialization) {
+        List<DoctorDto> doctors = doctorService.getDoctorsBySpecialization(specialization);
+        return ApiResponse.ok(doctors, "Doctors with specialization " + specialization + " retrieved successfully");
     }
 
     @GetMapping(path="/nextpage")
-    public PaginatedDoctorsDto getPaginatedDoctors(
+    public ResponseEntity<ApiResponse<PaginatedDoctorsDto>> getPaginatedDoctors(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size,
             @RequestParam(value = "start", required = false) Integer start,
             @RequestParam(value = "end", required = false) Integer end) {
+        PaginatedDoctorsDto result;
         // If start and end are provided, use range pagination
         if (start != null && end != null) {
-            return doctorService.getDoctorsByRange(start, end);
+            result = doctorService.getDoctorsByRange(start, end);
+        } else {
+            // Otherwise, use page and size (default to 0 and 100 if not provided)
+            int pageNum = (page != null) ? page : 0;
+            int pageSize = (size != null) ? size : 100;
+            result = doctorService.getDoctorsByPage(pageNum, pageSize);
         }
-        // Otherwise, use page and size (default to 0 and 100 if not provided)
-        int pageNum = (page != null) ? page : 0;
-        int pageSize = (size != null) ? size : 100;
-        return doctorService.getDoctorsByPage(pageNum, pageSize);
+        return ApiResponse.ok(result, "Doctors retrieved successfully");
     }
 }

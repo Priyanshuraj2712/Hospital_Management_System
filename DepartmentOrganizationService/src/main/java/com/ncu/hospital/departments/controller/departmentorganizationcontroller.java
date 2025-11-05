@@ -15,6 +15,8 @@ import com.ncu.hospital.departments.dto.DepartmentDto;
 import com.ncu.hospital.departments.dto.PaginatedDepartmentsDto;
 import java.util.List;
 import java.util.ArrayList;
+import org.springframework.http.ResponseEntity;
+import com.ncu.hospital.departments.dto.ApiResponse;
 
 @RequestMapping("/departments")
 @RestController
@@ -27,48 +29,57 @@ public class departmentorganizationcontroller {
     }
 
     @GetMapping(path="/")
-    public List<DepartmentDto> getAllDepartments() {
-        return departmentService.getAllDepartments();
+    public ResponseEntity<ApiResponse<List<DepartmentDto>>> getAllDepartments() {
+        List<DepartmentDto> departments = departmentService.getAllDepartments();
+        return ApiResponse.ok(departments, "Departments retrieved successfully");
     } 
 
     @GetMapping(path="/{id}")
-    public DepartmentDto getDepartmentById(@PathVariable("id") int id) {
-        return departmentService.getDepartmentById(id);
+    public ResponseEntity<ApiResponse<DepartmentDto>> getDepartmentById(@PathVariable("id") int id) {
+        DepartmentDto department = departmentService.getDepartmentById(id);
+        return ApiResponse.ok(department, "Department retrieved successfully");
     }
 
     @PostMapping(path="/")
-    public void addDepartment(@RequestBody DepartmentDto departmentDto) {
+    public ResponseEntity<ApiResponse<DepartmentDto>> addDepartment(@RequestBody DepartmentDto departmentDto) {
         departmentService.addDepartment(departmentDto);
+        return ApiResponse.ok(departmentDto, "Department added successfully");
     }
 
     @PutMapping(path="/{id}")
-    public void updateDepartment(@PathVariable("id") int id, @RequestBody DepartmentDto departmentDto) {
+    public ResponseEntity<ApiResponse<DepartmentDto>> updateDepartment(@PathVariable("id") int id, @RequestBody DepartmentDto departmentDto) {
         departmentService.updateDepartment(id, departmentDto);
+        return ApiResponse.ok(departmentDto, "Department updated successfully");
     }
 
     @DeleteMapping(path="/{id}")
-    public void deleteDepartment(@PathVariable("id") int id) {
+    public ResponseEntity<ApiResponse<Void>> deleteDepartment(@PathVariable("id") int id) {
         departmentService.deleteDepartment(id);
+        return ApiResponse.ok(null, "Department deleted successfully");
     }
 
     @GetMapping(path="/floor/{number}")
-    public List<DepartmentDto> getDepartmentsByFloor(@PathVariable("number") int floor) {
-        return departmentService.getDepartmentsByFloor(floor);
+    public ResponseEntity<ApiResponse<List<DepartmentDto>>> getDepartmentsByFloor(@PathVariable("number") int floor) {
+        List<DepartmentDto> departments = departmentService.getDepartmentsByFloor(floor);
+        return ApiResponse.ok(departments, "Departments on floor " + floor + " retrieved successfully");
     }
 
     @GetMapping(path="/nextpage")
-    public PaginatedDepartmentsDto getPaginatedDepartments(
+    public ResponseEntity<ApiResponse<PaginatedDepartmentsDto>> getPaginatedDepartments(
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size,
             @RequestParam(value = "start", required = false) Integer start,
             @RequestParam(value = "end", required = false) Integer end) {
+        PaginatedDepartmentsDto result;
         // If start and end are provided, use range pagination
         if (start != null && end != null) {
-            return departmentService.getDepartmentsByRange(start, end);
+            result = departmentService.getDepartmentsByRange(start, end);
+        } else {
+            // Otherwise, use page and size (default to 0 and 100 if not provided)
+            int pageNum = (page != null) ? page : 0;
+            int pageSize = (size != null) ? size : 100;
+            result = departmentService.getDepartmentsByPage(pageNum, pageSize);
         }
-        // Otherwise, use page and size (default to 0 and 100 if not provided)
-        int pageNum = (page != null) ? page : 0;
-        int pageSize = (size != null) ? size : 100;
-        return departmentService.getDepartmentsByPage(pageNum, pageSize);
+        return ApiResponse.ok(result, "Departments retrieved successfully");
     }
 }

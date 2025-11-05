@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.ncu.hospital.patients.model.Patient;
 import com.ncu.hospital.patients.irepository.IPatientRepository;    
-
 import java.util.List;
 @Repository(value = "PatientRepository")
 public class PatientRepository implements IPatientRepository {
@@ -33,38 +32,66 @@ public class PatientRepository implements IPatientRepository {
     public Patient getPatientById(int id) {
         String sql = "SELECT * FROM Patient WHERE id = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, new Object[]{id}, new PatientRowMapper());
+            List<Patient> patients = jdbcTemplate.query(sql, 
+                new PatientRowMapper(),
+                id
+            );
+            if (patients.isEmpty()) {
+                return null;
+            }
+            return patients.get(0);
         } catch (Exception e) {
             System.out.println("Error fetching patient by ID: " + e.getMessage());
-            return null;
+            throw new RuntimeException("Error retrieving patient: " + e.getMessage());
         }
     }
 
     public Patient getPatientByName(String name) {
         String sql = "SELECT * FROM Patient WHERE name = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, new Object[]{name}, new PatientRowMapper());
+            List<Patient> patients = jdbcTemplate.query(
+                sql, 
+                new PatientRowMapper(),
+                name
+            );
+            if (patients.isEmpty()) {
+                return null;
+            }
+            return patients.get(0);
         } catch (Exception e) {
             System.out.println("Error fetching patient by name: " + e.getMessage());
             return null;
         }
     }
 
-    public void addPatient(Patient patient) {
-    String sql = "INSERT INTO Patient (id, name, age, address, phoneNumber) VALUES (?, ?, ?, ?, ?)";
-    try {
-        jdbcTemplate.update(sql, patient.getId(), patient.getName(), patient.getAge(), patient.getAddress(), patient.getPhoneNumber());
-    } catch (Exception e) {
-        System.out.println("Error adding patient: " + e.getMessage());
-    } 
-}
+    public Patient addPatient(Patient patient) {
+        if (patient == null) {
+            throw new IllegalArgumentException("Patient cannot be null");
+        }
+        
+        String sql = "INSERT INTO Patient (name, age, address, phoneNumber) VALUES (?, ?, ?, ?)";
+        try {
+            jdbcTemplate.update(sql, 
+                patient.getName(),
+                patient.getAge(),
+                patient.getAddress(),
+                patient.getPhoneNumber()
+            );
+            return patient;
+        } catch (Exception e) {
+            System.out.println("Error adding patient: " + e.getMessage());
+            throw new RuntimeException("Failed to add patient: " + e.getMessage());
+        }
+    }
 
-    public void updatePatient(Patient patient) {
+    public Patient updatePatient(Patient patient) {
         String sql = "UPDATE Patient SET name = ?, age = ?, address = ?, phoneNumber = ? WHERE id = ?";
         try {
             jdbcTemplate.update(sql, patient.getName(), patient.getAge(), patient.getAddress(), patient.getPhoneNumber(), patient.getId());
+            return getPatientById(patient.getId());
         } catch (Exception e) {
             System.out.println("Error updating patient: " + e.getMessage());
+            return null;
         }
     }
 
@@ -82,7 +109,12 @@ public class PatientRepository implements IPatientRepository {
         String sql = "SELECT * FROM Patient LIMIT ? OFFSET ?";
         int offset = page * size;
         try {
-            return jdbcTemplate.query(sql, new Object[]{size, offset}, new PatientRowMapper());
+            return jdbcTemplate.query(
+                sql, 
+                new PatientRowMapper(),
+                size,
+                offset
+            );
         } catch (Exception e) {
             System.out.println("Error fetching paginated patients: " + e.getMessage());
             return null;
@@ -94,7 +126,12 @@ public class PatientRepository implements IPatientRepository {
         String sql = "SELECT * FROM Patient LIMIT ? OFFSET ?";
         int size = end - start + 1;
         try {
-            return jdbcTemplate.query(sql, new Object[]{size, start}, new PatientRowMapper());
+            return jdbcTemplate.query(
+                sql, 
+                new PatientRowMapper(),
+                size,
+                start
+            );
         } catch (Exception e) {
             System.out.println("Error fetching patients by range: " + e.getMessage());
             return null;

@@ -33,29 +33,56 @@ public class DoctorRepository implements IDoctorRepository {
     public Doctor getDoctorById(int id) {
         String sql = "SELECT * FROM Doctor WHERE id = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, new Object[]{id}, new DoctorRowMapper());
+            List<Doctor> results = jdbcTemplate.query(sql, new DoctorRowMapper(), id);
+            return results.isEmpty() ? null : results.get(0);
         } catch (Exception e) {
             System.out.println("Error fetching doctor by ID: " + e.getMessage());
             return null;
         }
     }
 
-    public void addDoctor(Doctor doctor) {
-        String sql = "INSERT INTO Doctor (id, name, specialization, phoneNumber, email) VALUES (?, ?, ?, ?,?)";
+    public Doctor getDoctorByEmail(String email) {
+        String sql = "SELECT * FROM Doctor WHERE email = ?";
         try {
-            jdbcTemplate.update(sql, doctor.getId(), doctor.getName(), doctor.getSpecialization(), doctor.getPhoneNumber(), doctor.getEmail());
+            List<Doctor> results = jdbcTemplate.query(sql, new DoctorRowMapper(), email);
+            return results.isEmpty() ? null : results.get(0);
         } catch (Exception e) {
-            System.out.println("Error adding doctor: " + e.getMessage());
-        } 
+            System.out.println("Error fetching doctor by email: " + e.getMessage());
+            return null;
+        }
     }
 
-    public void updateDoctor(Doctor doctor) {
+    public Doctor addDoctor(Doctor doctor) {
+        String sql = "INSERT INTO Doctor (name, specialization, phoneNumber, email) VALUES (?, ?, ?, ?)";
+        try {
+            int rowsAffected = jdbcTemplate.update(sql, 
+                doctor.getName(), 
+                doctor.getSpecialization(), 
+                doctor.getPhoneNumber(), 
+                doctor.getEmail()
+            );
+            return rowsAffected > 0 ? doctor : null;
+        } catch (Exception e) {
+            System.out.println("Error adding doctor: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public Doctor updateDoctor(Doctor doctor) {
         String sql = "UPDATE Doctor SET name = ?, specialization = ?, phoneNumber = ?, email = ? WHERE id = ?";
         try {
-            jdbcTemplate.update(sql, doctor.getName(), doctor.getSpecialization(), doctor.getPhoneNumber(), doctor.getEmail(), doctor.getId());
+            int rowsAffected = jdbcTemplate.update(sql, 
+                doctor.getName(), 
+                doctor.getSpecialization(), 
+                doctor.getPhoneNumber(), 
+                doctor.getEmail(), 
+                doctor.getId()
+            );
+            return rowsAffected > 0 ? doctor : null;
         } catch (Exception e) {
             System.out.println("Error updating doctor: " + e.getMessage());
-        } 
+            return null;
+        }
     }
 
     public void deleteDoctor(int id) {
@@ -64,25 +91,25 @@ public class DoctorRepository implements IDoctorRepository {
             jdbcTemplate.update(sql, id);
         } catch (Exception e) {
             System.out.println("Error deleting doctor: " + e.getMessage());
-        }   
+            throw new RuntimeException("Failed to delete doctor: " + e.getMessage());
+        }
     }
 
     public List<Doctor> getDoctorsBySpecialization(String specialization) {
         String sql = "SELECT * FROM Doctor WHERE specialization = ?";
         try {
-            return jdbcTemplate.query(sql, new Object[]{specialization}, new DoctorRowMapper());
+            return jdbcTemplate.query(sql, new DoctorRowMapper(), specialization);
         } catch (Exception e) {
             System.out.println("Error fetching doctors by specialization: " + e.getMessage());
             return null;
         }
     }
 
-    // Pagination: fetch by page and size
     public List<Doctor> getDoctorsByPage(int page, int size) {
         String sql = "SELECT * FROM Doctor LIMIT ? OFFSET ?";
         int offset = page * size;
         try {
-            return jdbcTemplate.query(sql, new Object[]{size, offset}, new DoctorRowMapper());
+            return jdbcTemplate.query(sql, new DoctorRowMapper(), size, offset);
         } catch (Exception e) {
             System.out.println("Error fetching paginated doctors: " + e.getMessage());
             return null;

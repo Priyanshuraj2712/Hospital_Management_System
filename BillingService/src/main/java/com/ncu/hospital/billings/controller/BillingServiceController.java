@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.http.ResponseEntity;
+import com.ncu.hospital.billings.dto.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.ncu.hospital.billings.dto.BillingDto;
 import com.ncu.hospital.billings.dto.PaginatedBillingsDto;
@@ -26,33 +29,41 @@ public class BillingServiceController {
     }
 
     @PostMapping("/")
-    public void addBill(@RequestBody BillingDto billingDto) {
-        billingService.addBill(billingDto);
+    public ResponseEntity<ApiResponse<Void>> addBill(@RequestBody BillingDto billingDto,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        billingService.addBill(billingDto, authHeader);
+        return ApiResponse.ok(null, "Bill added successfully");
     }
 
     @GetMapping("/")
-    public List<BillingDto> getAllBills() {
-        return billingService.getAllBills();
+    public ResponseEntity<ApiResponse<List<BillingDto>>> getAllBills() {
+        List<BillingDto> dtos = billingService.getAllBills();
+        return ApiResponse.ok(dtos, "Billing records retrieved successfully");
     }
 
     @GetMapping("/{id}")
-    public BillingDto getBillById(@PathVariable("id") int id) {
-        return billingService.getBillById(id);
+    public ResponseEntity<ApiResponse<BillingDto>> getBillById(@PathVariable("id") int id) {
+        BillingDto dto = billingService.getBillById(id);
+        return ApiResponse.ok(dto, "Billing record retrieved successfully");
     }
 
     @GetMapping("/patient/{id}")
-    public List<BillingDto> getBillsByPatientId(@PathVariable("id") int id) {
-        return billingService.getBillsByPatientId(id);
+    public ResponseEntity<ApiResponse<List<BillingDto>>> getBillsByPatientId(@PathVariable("id") int id,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        List<BillingDto> dtos = billingService.getBillsByPatientId(id, authHeader);
+        return ApiResponse.ok(dtos, "Billing records for patient retrieved successfully");
     }
 
     @PutMapping("/{id}")
-    public void updateBill(@PathVariable("id") int id, @RequestBody BillingDto billingDto) {
+    public ResponseEntity<ApiResponse<Void>> updateBill(@PathVariable("id") int id, @RequestBody BillingDto billingDto) {
         billingService.updateBill(id, billingDto);
+        return ApiResponse.ok(null, "Billing record updated successfully");
     }
 
     @DeleteMapping("/{id}")
-    public void deleteBill(@PathVariable("id") int id) {
+    public ResponseEntity<ApiResponse<Void>> deleteBill(@PathVariable("id") int id) {
         billingService.deleteBill(id);
+        return ApiResponse.ok(null, "Billing record deleted successfully");
     }
 
     @GetMapping("/nextpage")
