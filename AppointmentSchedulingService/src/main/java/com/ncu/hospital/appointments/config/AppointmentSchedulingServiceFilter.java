@@ -13,12 +13,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import reactor.core.publisher.Mono;
 import com.ncu.hospital.appointments.dto.AuthDto;
 import java.io.IOException;
+import org.springframework.beans.factory.annotation.Value;
 
 import io.micrometer.common.lang.NonNull; 
 @Component
 public class AppointmentSchedulingServiceFilter extends OncePerRequestFilter {
     private final WebClient.Builder webClientBuilder;
-
+    @Value("${apigateway.shared.secret}")
+    String sharedsecret;
     @Autowired
     public AppointmentSchedulingServiceFilter(WebClient.Builder webClientBuilder) {
         this.webClientBuilder = webClientBuilder;
@@ -46,7 +48,11 @@ public class AppointmentSchedulingServiceFilter extends OncePerRequestFilter {
                 .bodyValue(authDto)
                 .retrieve()
                 .toBodilessEntity();
-
+        String secret = request.getHeader("X-API-GATEWAY-SECRET");
+        if(sharedsecret == null || !sharedsecret.equals(secret)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
         ResponseEntity<Void> result = authResponse.block();
 
         if (result != null && result.getStatusCode().is2xxSuccessful()) {

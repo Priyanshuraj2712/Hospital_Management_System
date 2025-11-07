@@ -13,6 +13,8 @@ import reactor.core.publisher.Mono;
 
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
 import com.ncu.hospital.doctors.dto.AuthDto; 
 
 import io.micrometer.common.lang.NonNull;
@@ -20,7 +22,8 @@ import io.micrometer.common.lang.NonNull;
 public class DoctorManagementServiceFilter extends OncePerRequestFilter {
 
     private final WebClient.Builder webClientBuilder;
-
+    @Value("${apigateway.shared.secret}")
+    String sharedsecret;
     @Autowired
     public DoctorManagementServiceFilter(WebClient.Builder webClientBuilder) {
         this.webClientBuilder = webClientBuilder;
@@ -49,7 +52,11 @@ public class DoctorManagementServiceFilter extends OncePerRequestFilter {
                 .bodyValue(authDto)
                 .retrieve()
                 .toBodilessEntity();
-
+        String secret = request.getHeader("X-API-GATEWAY-SECRET");
+        if(sharedsecret == null || !sharedsecret.equals(secret)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
         ResponseEntity<Void> result = authResponse.block();
 
         if (result != null && result.getStatusCode().is2xxSuccessful()) {

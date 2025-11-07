@@ -1,5 +1,6 @@
 package com.ncu.hospital.billings.config;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,7 +18,8 @@ import io.micrometer.common.lang.NonNull;
 @Component
 public class BillingServiceFilter extends OncePerRequestFilter {
     private final WebClient.Builder webClientBuilder;
-
+    @Value("${apigateway.shared.secret}")
+    String sharedsecret;
     @Autowired
     public BillingServiceFilter(WebClient.Builder webClientBuilder) {
         this.webClientBuilder = webClientBuilder;
@@ -45,7 +47,11 @@ public class BillingServiceFilter extends OncePerRequestFilter {
                 .bodyValue(authDto)
                 .retrieve()
                 .toBodilessEntity();
-
+        String secret = request.getHeader("X-API-GATEWAY-SECRET");
+        if(sharedsecret == null || !sharedsecret.equals(secret)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
         ResponseEntity<Void> result = authResponse.block();
 
         if (result != null && result.getStatusCode().is2xxSuccessful()) {

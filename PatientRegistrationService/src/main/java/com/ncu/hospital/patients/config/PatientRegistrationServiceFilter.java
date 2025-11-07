@@ -3,6 +3,7 @@ package com.ncu.hospital.patients.config;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import jakarta.servlet.FilterChain;
@@ -22,6 +23,8 @@ public class PatientRegistrationServiceFilter extends OncePerRequestFilter {
     public PatientRegistrationServiceFilter(WebClient.Builder webClientBuilder) {
         this.webClientBuilder = webClientBuilder;
     }
+    @Value("${apigateway.shared.secret}")
+    String sharedsecret;
 
     @Override
     protected void doFilterInternal(
@@ -47,6 +50,12 @@ public class PatientRegistrationServiceFilter extends OncePerRequestFilter {
                 .retrieve()
                 .toBodilessEntity();
 
+        String secret = request.getHeader("X-API-GATEWAY-SECRET");
+        if(sharedsecret == null || !sharedsecret.equals(secret)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+        
         ResponseEntity<Void> result = authResponse.block();
 
         if (result != null && result.getStatusCode().is2xxSuccessful()) {

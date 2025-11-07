@@ -1,6 +1,7 @@
 package com.ncu.hospital.receptions.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -17,7 +18,9 @@ import java.io.IOException;
 import io.micrometer.common.lang.NonNull; 
 @Component
 public class ReceptionHandlingServiceFilter extends OncePerRequestFilter {
-     private final WebClient.Builder webClientBuilder;
+    private final WebClient.Builder webClientBuilder;
+    @Value("${apigateway.shared.secret}")
+    String sharedsecret;
 
     @Autowired
     public ReceptionHandlingServiceFilter(WebClient.Builder webClientBuilder) {
@@ -46,7 +49,11 @@ public class ReceptionHandlingServiceFilter extends OncePerRequestFilter {
                 .bodyValue(authDto)
                 .retrieve()
                 .toBodilessEntity();
-
+        String secret = request.getHeader("X-API-GATEWAY-SECRET");
+        if(sharedsecret == null || !sharedsecret.equals(secret)) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
         ResponseEntity<Void> result = authResponse.block();
 
         if (result != null && result.getStatusCode().is2xxSuccessful()) {
