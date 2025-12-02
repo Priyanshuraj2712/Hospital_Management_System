@@ -14,7 +14,6 @@ import com.ncu.hospital.departments.service.DepartmentService;
 import com.ncu.hospital.departments.dto.DepartmentDto;
 import com.ncu.hospital.departments.dto.PaginatedDepartmentsDto;
 import java.util.List;
-import java.util.ArrayList;
 import org.springframework.http.ResponseEntity;
 import com.ncu.hospital.departments.dto.ApiResponse;
 

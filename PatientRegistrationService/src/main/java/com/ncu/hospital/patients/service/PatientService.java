@@ -82,14 +82,13 @@ public class PatientService {
                 System.out.println("Warning during duplicate check: " + e.getMessage());
             }
 
-            // Create new Patient object
+            
             Patient patient = new Patient();
             patient.setName(patientDto.getName());
             patient.setAge(patientDto.getAge());
             patient.setAddress(patientDto.getAddress());
             patient.setPhoneNumber(patientDto.getPhoneNumber());
 
-            // Save patient and get saved entity
             Patient savedPatient = patientRepository.addPatient(patient);
             if (savedPatient == null) {
                 throw new DatabaseException("Failed to save patient");
